@@ -1,9 +1,9 @@
+
 ///              MP3 PLAYER PROJECT
 /// http://educ8s.tv/arduino-mp3-player/
 //////////////////////////////////////////
 
-
-#include "SoftwareSerial.h"
+#include <SoftwareSerial.h>
 SoftwareSerial mySerial(10, 11);
 # define Start_Byte 0x7E
 # define Version_Byte 0xFF
@@ -17,28 +17,39 @@ SoftwareSerial mySerial(10, 11);
 
 boolean isPlaying = false;
 
-
+#define sassWrite(pin, state) digitalWrite(pin,state) 
+#define sassSitNWait(time)  delay(time)
 
 void setup () {
 pinMode(RELAY, OUTPUT);
+sassWrite(RELAY, LOW);
 mySerial.begin (9600);
-playFirst();
+initSass();
 }
 
 
 
 void loop () { 
-
+  execute_CMD(0x01, 0, 0);
+  execute_CMD(0x0D, 0, 0);
+  sassSitNWait(2000);
+  fingerSnap();
+  sassSitNWait(2000);
 }
 
-void playFirst()
+void fingerSnap()
+{
+  sassWrite(RELAY, HIGH);
+  sassSitNWait(300);
+  sassWrite(RELAY, LOW);
+}
+
+void initSass()
 {
   execute_CMD(0x3F, 0, 0);
-  delay(500);
+  sassSitNWait(500);
   setVolume(20);
-  delay(500);
-  execute_CMD(0x11,0,1); 
-  delay(500);
+  sassSitNWait(500);
 }
 
 void pause()
@@ -70,8 +81,7 @@ void setVolume(int volume)
   execute_CMD(0x06, 0, volume); // Set the volume (0x00~0x30)
   delay(2000);
 }
-
-void 
+ 
 
 void execute_CMD(byte CMD, byte Par1, byte Par2)
 // Excecute the command and parameters
